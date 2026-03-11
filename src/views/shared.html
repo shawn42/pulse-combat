@@ -58,12 +58,13 @@
   <script>
     function fmt(s) { return Math.max(0, s).toFixed(1) + 's' }
     function pct(cur, dur) { return Math.min(100, (cur / dur) * 100) }
+    function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') }
 
     function entityCard(e) {
       if (!e || !e.timer || e.timer.current == null || e.timer.duration == null) return ''
       const p = pct(e.timer.current, e.timer.duration)
       return `<div class="panel">
-        <div class="entity-name">${e.name}</div>
+        <div class="entity-name">${escapeHtml(e.name)}</div>
         <div class="bar-wrap"><div class="bar energy-bar ${p >= 100 ? 'full' : ''}" style="width:${p}%"></div></div>
         <div class="time-label">${fmt(e.timer.current)} / ${fmt(e.timer.duration)}</div>
       </div>`

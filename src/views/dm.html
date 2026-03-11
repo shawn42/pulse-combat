@@ -97,7 +97,7 @@
 
     function fmt(s) { return Math.max(0, s).toFixed(1) + 's' }
     function pct(cur, dur) { return Math.min(100, (cur / dur) * 100) }
-    function entitySig(entities) { return entities.map(e => e.id + ':' + e.timer.duration).join(',') }
+    function entitySig(entities) { return entities.map(e => e.id + ':' + (e.timer ? e.timer.duration : '')).join(',') }
 
     function escapeHtml(str) {
       return String(str)
