@@ -25,7 +25,7 @@
     .sub-btn:disabled { opacity: 0.3; cursor: default; }
     .btn-bonus { background: #0f4c75; color: #7dd3fc; }
     .btn-react { background: #1e3a5f; color: #93c5fd; }
-    .leave-btn { display: block; text-align: center; padding: 8px; font-size: 12px; color: #6b3333; text-decoration: none; cursor: pointer; background: none; border: none; margin-top: auto; }
+    .leave-btn { position: fixed; bottom: 6px; left: 10px; padding: 4px; font-size: 20px; color: #333; text-decoration: none; cursor: pointer; background: none; border: none; }
     .error-msg { background: #7f1d1d; color: #fca5a5; text-align: center; padding: 20px; border-radius: 10px; font-weight: bold; font-size: 16px; margin: 40px auto; max-width: 360px; }
     .mini-section-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin: 8px 0 4px; }
     .mini-section-label:first-child { margin-top: 0; }
@@ -41,7 +41,7 @@
   <div id="banner" class="banner">⚡ Timers Paused</div>
   <h1 id="player-name">⚔</h1>
 
-  <div class="panel">
+  <div id="fate-panel" class="panel" style="display:none">
     <div class="panel-title">⚡ Fate Timer</div>
     <div class="bar-wrap"><div id="fate-bar" class="bar fate-bar" style="width:100%"></div></div>
     <div id="fate-time" class="time-label">30s</div>
@@ -127,6 +127,7 @@
 
       function render(state) {
         if (!state || !state.fate) return
+        document.getElementById('fate-panel').style.display = ''
         document.getElementById('banner').classList.toggle('visible', state.fatePaused || state.dmPaused)
         const fp = pct(state.fate.current, state.fate.duration)
         document.getElementById('fate-bar').style.width = fp + '%'

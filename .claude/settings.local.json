@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/shawn42/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.0/lib/brainstorm-server/start-server.sh:*)",
+      "Bash(npm install:*)",
+      "Bash(bun install:*)",
+      "Bash(npm:*)",
+      "Bash(git init:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(bun:*)",
+      "Bash(curl:*)",
+      "Bash(~/.bun/bin/bun:*)",
+      "Bash(git:*)",
+      "Bash(/Users/shawn42/.bun/bin/bun test:*)",
+      "WebFetch(domain:)",
+      "Bash(source:*)",
+      "Bash(echo:*)",
+      "Bash(export:*)",
+      "WebSearch",
+      "WebFetch(domain:deepwiki.com)",
+      "WebFetch(domain:elysiajs.com)",
+      "Bash(pkill:*)"
+    ]
+  }
+}
