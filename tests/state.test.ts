@@ -65,6 +65,14 @@ describe('addEntity', () => {
     expect(s.entities[0].timer.current).toBe(0)
   })
 
+  it('monster added when players present starts with duration 15 - playerCount', () => {
+    let s = addEntity(createInitialState(), 'Alice', 'player')
+    s = addEntity(s, 'Bob', 'player')
+    s = addEntity(s, 'Boss', 'monster')
+    const boss = s.entities.find(e => e.name === 'Boss')!
+    expect(boss.timer.duration).toBe(13)
+  })
+
   it('player join reduces monster duration by 1', () => {
     let s = addEntity(createInitialState(), 'Boss', 'monster')
     s = addEntity(s, 'Alice', 'player')

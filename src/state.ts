@@ -61,7 +61,9 @@ export function addEntity(
   if (type === 'player' && state.entities.some(e => e.name === name && e.type === 'player')) {
     return state
   }
-  let entities = [...state.entities, { id, name, type, timer: { duration: 15, current: 0 } }]
+  const playerCount = state.entities.filter(e => e.type === 'player').length
+  const duration = type === 'monster' ? Math.max(1, 15 - playerCount) : 15
+  let entities = [...state.entities, { id, name, type, timer: { duration, current: 0 } }]
   if (type === 'player') {
     entities = entities.map(e =>
       e.type === 'monster'
