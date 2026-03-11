@@ -5,9 +5,9 @@ import {
   setFateDuration, setEntityDuration,
   tapFate, tapEnergy, tapAction, tapBonus, tapReact,
 } from './state.ts'
-import { getState, setState, addClient, removeClient, broadcast } from './store.ts'
+import { getState, setState, broadcast } from './store.ts'
 
-function dispatch(msg: unknown): void {
+export function dispatch(msg: unknown): void {
   if (typeof msg !== 'string') return
   let action: Record<string, unknown>
   try { action = JSON.parse(msg) } catch { return }
@@ -41,11 +41,6 @@ export const app = new Elysia()
   .get('/', () => Bun.file('src/views/shared.html'))
   .get('/dm', () => Bun.file('src/views/dm.html'))
   .get('/shared.js', () => Bun.file('src/views/shared.js'))
-  .ws('/ws', {
-    open(ws) { addClient(ws) },
-    close(ws) { removeClient(ws) },
-    message(_ws, msg) { dispatch(msg) },
-  })
   .get('/:name', ({ params: { name } }) => {
     const s = getState()
     if (!s.entities.some(e => e.name === name && e.type === 'player')) {
