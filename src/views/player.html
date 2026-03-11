@@ -31,7 +31,6 @@
     .mini-section-label:first-child { margin-top: 0; }
     .mini-row { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
     .mini-name { font-size: 11px; color: #888; min-width: 80px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .mini-name.me { color: #a78bfa; font-weight: bold; }
     .mini-bar-wrap { flex: 1; background: #222; border-radius: 3px; overflow: hidden; height: 7px; }
     .mini-bar { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #0369a1, #38bdf8); }
     .mini-bar.full { background: linear-gradient(90deg, #15803d, #4ade80); }
@@ -90,9 +89,8 @@
       function miniSig(entities) { return entities.map(e => e.id + ':' + e.type).join(',') }
 
       function miniRowHTML(e) {
-        const isMe = e.name === playerName && e.type === 'player'
         return `<div class="mini-row" id="mrow-${escapeHtml(e.id)}">
-          <span class="mini-name${isMe ? ' me' : ''}">${escapeHtml(e.name)}</span>
+          <span class="mini-name">${escapeHtml(e.name)}</span>
           <div class="mini-bar-wrap"><div id="mbar-${escapeHtml(e.id)}" class="mini-bar" style="width:0%"></div></div>
           <span id="mtime-${escapeHtml(e.id)}" class="mini-time">0s</span>
         </div>`
@@ -152,11 +150,12 @@
         }
 
         const allTimers = document.getElementById('all-timers')
-        if (state.entities.length) {
+        const others = state.entities.filter(e => !(e.name === playerName && e.type === 'player'))
+        if (others.length) {
           allTimers.style.display = ''
-          const sig = miniSig(state.entities)
-          if (sig !== lastMiniSig) { rebuildMini(state.entities); lastMiniSig = sig }
-          else { updateMini(state.entities) }
+          const sig = miniSig(others)
+          if (sig !== lastMiniSig) { rebuildMini(others); lastMiniSig = sig }
+          else { updateMini(others) }
         } else {
           allTimers.style.display = 'none'
         }
