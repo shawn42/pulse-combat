@@ -192,6 +192,8 @@
       const fp = pct(state.fate.current, state.fate.duration)
       document.getElementById('fate-bar').style.width = fp + '%'
       document.getElementById('fate-time').textContent = fmt(state.fate.current)
+      const fateDurInput = document.getElementById('fate-dur')
+      if (document.activeElement !== fateDurInput) fateDurInput.value = state.fate.duration
 
       const sig = entitySig(state.entities)
       if (sig !== lastEntitySig) { rebuildCards(state.entities); lastEntitySig = sig }

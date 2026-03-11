@@ -68,6 +68,21 @@ function connect(onState) {
   return getWs
 }
 
+;(function() {
+  const el = document.createElement('div')
+  el.style.cssText = 'position:fixed;bottom:6px;right:10px;font-size:20px;color:#333;cursor:pointer;font-family:monospace;user-select:none;'
+  el.textContent = location.host
+  el.title = 'Copy URL'
+  el.addEventListener('click', () => {
+    navigator.clipboard.writeText(location.protocol + '//' + location.host).then(() => {
+      const prev = el.textContent
+      el.textContent = 'copied!'
+      setTimeout(() => { el.textContent = prev }, 1500)
+    }).catch(() => {})
+  })
+  document.body.appendChild(el)
+})()
+
 // animate(getState, render) — rAF loop that calls render with interpolated state each frame.
 function animate(getState, render) {
   function frame() {

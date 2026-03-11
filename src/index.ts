@@ -1,3 +1,4 @@
+import os from 'os'
 import { app, dispatch } from './app.ts'
 import { startTicker } from './ticker.ts'
 import { addClient, removeClient } from './store.ts'
@@ -20,4 +21,14 @@ const server = Bun.serve({
   },
 })
 
-console.log(`⚔ Pulse Combat running at http://localhost:${server.port}`)
+const nets = os.networkInterfaces()
+const lanIPs = Object.values(nets).flat()
+  .filter(n => n && n.family === 'IPv4' && !n.internal)
+  .map(n => n!.address)
+
+console.log(`\n⚔  Pulse Combat`)
+console.log(`   Local:   http://localhost:${server.port}`)
+for (const ip of lanIPs) {
+  console.log(`   Network: http://${ip}:${server.port}`)
+}
+console.log()
