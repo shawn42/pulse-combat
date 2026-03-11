@@ -1,5 +1,7 @@
 # Pulse Combat
 
+<img src="docs/pulse-combat-system-logo.png" width="300" height="300" alt="Pulse Combat System">
+
 A real-time combat timer app for the Chaos Pulse variant of D&D 5e. Built with [Bun](https://bun.sh) + [Elysia](https://elysiajs.com).
 
 ## What It Does
@@ -63,6 +65,10 @@ When the Fate timer expires, a chime plays on all connected devices.
 - **Server** — Bun.serve with native WebSocket handling (`src/index.ts`)
 - **Views** — plain HTML + vanilla JS, no framework (`src/views/`)
 - **shared.js** — WebSocket connection, interpolation, audio unlock (served to all views)
+
+## Documentation
+
+- [Chaos Pulse Combat System Overview](docs/pulse_combat_system_overview.md) — full rules, scaling tables, spell handling, stat blocks
 
 ## Running Tests
 
