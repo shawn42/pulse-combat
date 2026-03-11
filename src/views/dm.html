@@ -22,7 +22,9 @@
     .panel { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 12px; }
     .panel-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 8px; }
     .dur-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; margin-bottom: 6px; }
-    .dur-input { width: 50px; background: #111; border: 1px solid #333; color: #aaa; padding: 3px 6px; border-radius: 4px; font-size: 12px; text-align: center; }
+    .dur-input { width: 44px; background: #111; border: 1px solid #333; color: #aaa; padding: 3px 6px; border-radius: 4px; font-size: 12px; text-align: center; -moz-appearance: textfield; }
+    .dur-input::-webkit-inner-spin-button, .dur-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .dur-btn { background: #222; border: 1px solid #444; color: #aaa; padding: 2px 8px; border-radius: 4px; font-size: 13px; cursor: pointer; line-height: 1; }
     .bar-wrap { background: #222; border-radius: 6px; overflow: hidden; height: 12px; margin: 4px 0; cursor: pointer; }
     .bar { height: 100%; border-radius: 6px; transition: width 150ms linear; }
     .fate-bar { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
@@ -48,6 +50,9 @@
     .sub-btn:disabled { opacity: 0.3; cursor: default; }
     .btn-bonus { background: #0f4c75; color: #7dd3fc; }
     .btn-react { background: #1e3a5f; color: #93c5fd; }
+    .actions-toggle { background: none; border: none; color: #555; font-size: 10px; cursor: pointer; padding: 4px 0 0; display: block; }
+    .actions-collapse { display: none; }
+    .actions-collapse.open { display: block; }
   </style>
 </head>
 <body>
@@ -67,7 +72,7 @@
     <div class="left-col">
       <div class="panel">
         <div class="panel-title">⚡ Fate Timer</div>
-        <div class="dur-row">Duration: <input id="fate-dur" type="number" class="dur-input" value="30" min="1">s</div>
+        <div class="dur-row">Duration: <button class="dur-btn" data-action="dur:dec" data-id="fate">−</button> <input id="fate-dur" type="number" class="dur-input" value="30" min="1"> <button class="dur-btn" data-action="dur:inc" data-id="fate">+</button>s</div>
         <div class="bar-wrap" id="fate-bar-wrap">
           <div id="fate-bar" class="bar fate-bar" style="width:100%"></div>
         </div>
@@ -117,15 +122,20 @@
           <span class="entity-name">${safeName}</span>
           <button class="remove-btn" data-action="dm:removeNPC" data-id="${safeId}">✕ remove</button>
         </div>
-        <div class="dur-row">Dur: <input id="dur-${safeId}" type="number" class="dur-input" value="${escapeHtml(e.timer.duration)}" min="1">s</div>
+        <div class="dur-row">Dur: <button class="dur-btn" data-action="dur:dec" data-id="${safeId}">−</button> <input id="dur-${safeId}" type="number" class="dur-input" value="${escapeHtml(e.timer.duration)}" min="1"> <button class="dur-btn" data-action="dur:inc" data-id="${safeId}">+</button>s</div>
         <div class="bar-wrap" data-action="tap:energy" data-id="${safeId}">
           <div id="bar-${safeId}" class="bar energy-bar" style="width:0%"></div>
         </div>
         <div id="time-${safeId}" class="time-label">0s</div>
-        <button id="action-${safeId}" class="action-btn" disabled data-action="tap:action" data-id="${safeId}">ACTION</button>
-        <div class="sub-btns">
-          <button id="bonus-${safeId}" class="sub-btn btn-bonus" disabled data-action="tap:bonus" data-id="${safeId}">Bonus/Move</button>
-          <button id="react-${safeId}" class="sub-btn btn-react" disabled data-action="tap:react" data-id="${safeId}">React</button>
+        ${e.type === 'player'
+          ? `<button class="actions-toggle" onclick="this.nextElementSibling.classList.toggle('open');this.textContent=this.nextElementSibling.classList.contains('open')?'Actions ▴':'Actions ▾'">Actions ▾</button>
+        <div class="actions-collapse">`
+          : '<div>'}
+          <button id="action-${safeId}" class="action-btn" disabled data-action="tap:action" data-id="${safeId}">ACTION</button>
+          <div class="sub-btns">
+            <button id="bonus-${safeId}" class="sub-btn btn-bonus" disabled data-action="tap:bonus" data-id="${safeId}">Bonus/Move</button>
+            <button id="react-${safeId}" class="sub-btn btn-react" disabled data-action="tap:react" data-id="${safeId}">React</button>
+          </div>
         </div>
       </div>`
     }
@@ -218,6 +228,24 @@
         case 'tap:bonus':  if (id) send({ type: 'tap:bonus', id }); break
         case 'tap:react':  if (id) send({ type: 'tap:react', id }); break
         case 'addNPC':     addNPC(target.dataset.npcType); break
+        case 'dur:dec':
+        case 'dur:inc': {
+          const delta = action === 'dur:inc' ? 1 : -1
+          if (id === 'fate') {
+            const inp = document.getElementById('fate-dur')
+            const val = Math.max(1, parseInt(inp.value) + delta)
+            inp.value = val
+            send({ type: 'dm:setFateDuration', seconds: val })
+          } else if (id) {
+            const inp = document.getElementById('dur-' + id)
+            if (inp) {
+              const val = Math.max(1, parseInt(inp.value) + delta)
+              inp.value = val
+              send({ type: 'dm:setEntityDuration', id, seconds: val })
+            }
+          }
+          break
+        }
       }
     })
 

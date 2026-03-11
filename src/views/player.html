@@ -18,14 +18,14 @@
     .energy-bar { background: linear-gradient(90deg, #0369a1, #38bdf8); }
     .energy-bar.full { background: linear-gradient(90deg, #15803d, #4ade80); }
     .time-label { text-align: center; font-size: 12px; color: #666; margin-top: 3px; }
-    .action-btn { width: 100%; padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; background: #1d4ed8; color: white; transition: opacity 200ms; }
+    .action-btn { height: 50%; width: 100%; padding: 50px; font-size: 18px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; background: #1d4ed8; color: white; transition: opacity 200ms; }
     .action-btn:disabled { opacity: 0.3; cursor: default; }
     .sub-btns { display: flex; gap: 8px; margin-top: 8px; }
-    .sub-btn { flex: 1; padding: 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: opacity 200ms; }
+    .sub-btn { flex: 1; padding: 38px 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: opacity 200ms; }
     .sub-btn:disabled { opacity: 0.3; cursor: default; }
     .btn-bonus { background: #0f4c75; color: #7dd3fc; }
     .btn-react { background: #1e3a5f; color: #93c5fd; }
-    .leave-btn { width: 100%; padding: 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; background: #7f1d1d; color: #fca5a5; margin-top: auto; }
+    .leave-btn { display: block; text-align: center; padding: 8px; font-size: 12px; color: #6b3333; text-decoration: none; cursor: pointer; background: none; border: none; margin-top: auto; }
     .error-msg { background: #7f1d1d; color: #fca5a5; text-align: center; padding: 20px; border-radius: 10px; font-weight: bold; font-size: 16px; margin: 40px auto; max-width: 360px; }
     .mini-section-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin: 8px 0 4px; }
     .mini-section-label:first-child { margin-top: 0; }
@@ -166,9 +166,6 @@
         location.href = '/'
       }
 
-      document.getElementById('energy-wrap').addEventListener('click', () => {
-        if (playerEntity) send({ type: 'tap:energy', id: playerEntity.id })
-      })
 
       getWs = connect(function(getState) {
         animate(getState, render)

@@ -65,6 +65,16 @@ describe('addEntity', () => {
     expect(s.entities[0].timer.current).toBe(0)
   })
 
+  it('monster added before combat starts with current = 0', () => {
+    const s = addEntity(createInitialState(), 'Goblin', 'monster')
+    expect(s.entities[0].timer.current).toBe(0)
+  })
+
+  it('monster added after combat starts with current = duration', () => {
+    const s = addEntity(dmStart(createInitialState()), 'Goblin', 'monster')
+    expect(s.entities[0].timer.current).toBe(s.entities[0].timer.duration)
+  })
+
   it('monster added when players present starts with duration 15 - playerCount', () => {
     let s = addEntity(createInitialState(), 'Alice', 'player')
     s = addEntity(s, 'Bob', 'player')

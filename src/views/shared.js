@@ -19,6 +19,18 @@ function lerpState(a, b, t) {
 
 // connect(onState) — sets up WebSocket with reconnect logic, calls onState(data) on each state tick.
 // Returns a getter for the current WebSocket so views can call send().
+const fateChime = new Audio('/fate-chime.mp3')
+fateChime.preload = 'auto'
+
+// Unlock audio on first user gesture (required by browser autoplay policy)
+function unlockAudio() {
+  fateChime.play().then(() => { fateChime.pause(); fateChime.currentTime = 0 }).catch(() => {})
+  document.removeEventListener('pointerdown', unlockAudio)
+  document.removeEventListener('keydown', unlockAudio)
+}
+document.addEventListener('pointerdown', unlockAudio)
+document.addEventListener('keydown', unlockAudio)
+
 function connect(onState) {
   let ws
   let prevState = null, nextState = null, lastTick = 0
@@ -29,6 +41,10 @@ function connect(onState) {
       let m
       try { m = JSON.parse(e.data) } catch { return }
       if (m.type === 'state') {
+        if (nextState && !nextState.fatePaused && m.data.fatePaused) {
+          fateChime.currentTime = 0
+          fateChime.play().catch(() => {})
+        }
         prevState = nextState ?? m.data
         nextState = m.data
         lastTick = performance.now()

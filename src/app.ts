@@ -41,6 +41,7 @@ export const app = new Elysia()
   .get('/', () => Bun.file('src/views/shared.html'))
   .get('/dm', () => Bun.file('src/views/dm.html'))
   .get('/shared.js', () => Bun.file('src/views/shared.js'))
+  .get('/fate-chime.mp3', () => Bun.file('src/views/fate-chime.mp3'))
   .get('/player/:name', ({ params: { name } }) => {
     const s = getState()
     if (!s.entities.some(e => e.name === name && e.type === 'player')) {
