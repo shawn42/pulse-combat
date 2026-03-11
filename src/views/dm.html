@@ -1,1 +1,213 @@
-<!DOCTYPE html><html><body><h1>DM</h1></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚔ DM Control</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d0d0d; color: #ccc; font-family: system-ui, sans-serif; min-height: 100dvh; padding: 12px; }
+    .banner { display: none; background: #7f1d1d; color: #fca5a5; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; font-weight: bold; font-size: 15px; align-items: center; justify-content: space-between; gap: 12px; }
+    .banner.visible { display: flex; }
+    .continue-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    .top-bar { display: flex; align-items: center; gap: 8px; background: #111; border: 1px solid #333; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; flex-wrap: wrap; }
+    .top-title { color: #a78bfa; font-weight: bold; font-size: 16px; margin-right: auto; }
+    .top-btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
+    .btn-start { background: #166534; color: #86efac; }
+    .btn-pause { background: #78350f; color: #fde68a; }
+    .btn-reset { background: #3b0764; color: #d8b4fe; }
+    .main { display: flex; flex-direction: column; gap: 12px; }
+    @media (min-width: 640px) { .main { display: grid; grid-template-columns: 240px 1fr; gap: 16px; align-items: start; } }
+    .left-col { display: flex; flex-direction: column; gap: 10px; }
+    .panel { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 12px; }
+    .panel-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 8px; }
+    .dur-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; margin-bottom: 6px; }
+    .dur-input { width: 50px; background: #111; border: 1px solid #333; color: #aaa; padding: 3px 6px; border-radius: 4px; font-size: 12px; text-align: center; }
+    .bar-wrap { background: #222; border-radius: 6px; overflow: hidden; height: 12px; margin: 4px 0; cursor: pointer; }
+    .bar { height: 100%; border-radius: 6px; transition: width 150ms linear; }
+    .fate-bar { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+    .energy-bar { background: linear-gradient(90deg, #0369a1, #38bdf8); }
+    .energy-bar.full { background: linear-gradient(90deg, #15803d, #4ade80); }
+    .time-label { text-align: center; font-size: 11px; color: #666; margin-top: 3px; }
+    .add-npc-input { width: 100%; background: #111; border: 1px solid #333; color: #ccc; padding: 8px; border-radius: 6px; font-size: 13px; margin-bottom: 8px; outline: none; }
+    .add-npc-input:focus { border-color: #a78bfa; }
+    .add-npc-btns { display: flex; gap: 6px; }
+    .btn-monster { flex: 1; background: #1e3a5f; color: #93c5fd; border: none; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .btn-minion { flex: 1; background: #3b0764; color: #d8b4fe; border: none; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin: 0 0 8px; padding-bottom: 6px; border-bottom: 1px solid #222; }
+    .entity-section { margin-bottom: 16px; }
+    .entity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+    .entity-card { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px; }
+    .entity-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .entity-name { color: #e2e8f0; font-size: 13px; font-weight: bold; }
+    .remove-btn { color: #ef4444; font-size: 11px; cursor: pointer; background: none; border: none; padding: 0; }
+    .action-btn { width: 100%; padding: 10px; font-size: 12px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin-top: 6px; background: #1d4ed8; color: white; transition: opacity 200ms; }
+    .action-btn:disabled { opacity: 0.3; cursor: default; }
+    .sub-btns { display: flex; gap: 4px; margin-top: 4px; }
+    .sub-btn { flex: 1; padding: 7px; font-size: 11px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; transition: opacity 200ms; }
+    .sub-btn:disabled { opacity: 0.3; cursor: default; }
+    .btn-bonus { background: #0f4c75; color: #7dd3fc; }
+    .btn-react { background: #1e3a5f; color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <div id="banner" class="banner">
+    <span id="banner-text">⚡ Timers Paused</span>
+    <button id="continue-btn" class="continue-btn" style="display:none" onclick="send({type:'dm:continue'})">▶ Continue</button>
+  </div>
+
+  <div class="top-bar">
+    <span class="top-title">⚔ DM Control</span>
+    <button class="top-btn btn-start" onclick="send({type:'dm:start'})">▶ Start</button>
+    <button class="top-btn btn-pause" onclick="send({type:'dm:pause'})">⏸ Pause</button>
+    <button class="top-btn btn-reset" onclick="confirmReset()">↺ Reset</button>
+  </div>
+
+  <div class="main">
+    <div class="left-col">
+      <div class="panel">
+        <div class="panel-title">⚡ Fate Timer</div>
+        <div class="dur-row">Duration: <input id="fate-dur" type="number" class="dur-input" value="30" min="1">s</div>
+        <div class="bar-wrap" id="fate-bar-wrap">
+          <div id="fate-bar" class="bar fate-bar" style="width:100%"></div>
+        </div>
+        <div id="fate-time" class="time-label">30s</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Add NPC</div>
+        <input id="npc-name" type="text" class="add-npc-input" placeholder="NPC name...">
+        <div class="add-npc-btns">
+          <button class="btn-monster" onclick="addNPC('monster')">+ Monster</button>
+          <button class="btn-minion" onclick="addNPC('minion')">+ Minion</button>
+        </div>
+      </div>
+    </div>
+    <div id="right-col"></div>
+  </div>
+
+  <script>
+    let ws, lastEntitySig = '', prevState = null, nextState = null, lastTick = 0
+    function lerp(a, b, t) { return a + (b - a) * t }
+    function lerpState(a, b, t) {
+      if (!a) return b
+      return {
+        ...b,
+        fate: { ...b.fate, current: lerp(a.fate.current, b.fate.current, t) },
+        entities: b.entities.map(e => {
+          const ea = a.entities.find(x => x.id === e.id)
+          if (!ea) return e
+          return { ...e, timer: { ...e.timer, current: lerp(ea.timer.current, e.timer.current, t) } }
+        })
+      }
+    }
+    function connect() {
+      ws = new WebSocket('ws://' + location.host + '/ws')
+      ws.onmessage = e => {
+        const m = JSON.parse(e.data)
+        if (m.type === 'state') { prevState = nextState ?? m.data; nextState = m.data; lastTick = performance.now() }
+      }
+      ws.onclose = () => setTimeout(connect, 1000)
+    }
+    function animate() { if (nextState) { const alpha = Math.min(1, (performance.now() - lastTick) / 100); render(lerpState(prevState, nextState, alpha)) } requestAnimationFrame(animate) }
+    requestAnimationFrame(animate)
+    function send(action) { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(action)) }
+    function fmt(s) { return Math.max(0, s).toFixed(1) + 's' }
+    function pct(cur, dur) { return Math.min(100, (cur / dur) * 100) }
+    function entitySig(entities) { return entities.map(e => e.id + ':' + e.timer.duration).join(',') }
+
+    function entityCardHTML(e) {
+      return `<div class="entity-card" id="card-${e.id}">
+        <div class="entity-header">
+          <span class="entity-name">${e.name}</span>
+          <button class="remove-btn" onclick="send({type:'dm:removeNPC',id:'${e.id}'})">✕ remove</button>
+        </div>
+        <div class="dur-row">Dur: <input id="dur-${e.id}" type="number" class="dur-input" value="${e.timer.duration}" min="1">s</div>
+        <div class="bar-wrap" onclick="send({type:'tap:energy',id:'${e.id}'})">
+          <div id="bar-${e.id}" class="bar energy-bar" style="width:0%"></div>
+        </div>
+        <div id="time-${e.id}" class="time-label">0s</div>
+        <button id="action-${e.id}" class="action-btn" disabled onclick="send({type:'tap:action',id:'${e.id}'})">ACTION</button>
+        <div class="sub-btns">
+          <button id="bonus-${e.id}" class="sub-btn btn-bonus" disabled onclick="send({type:'tap:bonus',id:'${e.id}'})">Bonus/Move</button>
+          <button id="react-${e.id}" class="sub-btn btn-react" disabled onclick="send({type:'tap:react',id:'${e.id}'})">React</button>
+        </div>
+      </div>`
+    }
+
+    function groupHTML(label, entities) {
+      if (!entities.length) return ''
+      return `<div class="entity-section">
+        <div class="section-label">${label}</div>
+        <div class="entity-grid">${entities.map(entityCardHTML).join('')}</div>
+      </div>`
+    }
+
+    function rebuildCards(entities) {
+      document.getElementById('right-col').innerHTML =
+        groupHTML('Monsters', entities.filter(e => e.type === 'monster')) +
+        groupHTML('Minions', entities.filter(e => e.type === 'minion')) +
+        groupHTML('Players', entities.filter(e => e.type === 'player'))
+      entities.forEach(e => {
+        const input = document.getElementById('dur-' + e.id)
+        if (input) input.addEventListener('change', () => {
+          const secs = parseInt(input.value)
+          if (secs > 0) send({ type: 'dm:setEntityDuration', id: e.id, seconds: secs })
+        })
+      })
+    }
+
+    function updateCards(entities) {
+      entities.forEach(e => {
+        const p = pct(e.timer.current, e.timer.duration)
+        const bar = document.getElementById('bar-' + e.id)
+        if (bar) {
+          bar.style.width = p + '%'
+          bar.className = 'bar energy-bar' + (p >= 100 ? ' full' : '')
+        }
+        const timeEl = document.getElementById('time-' + e.id)
+        if (timeEl) timeEl.textContent = fmt(e.timer.current) + ' / ' + fmt(e.timer.duration)
+        const ab = document.getElementById('action-' + e.id); if (ab) ab.disabled = p < 100
+        const bb = document.getElementById('bonus-' + e.id);  if (bb) bb.disabled = p < 50
+        const rb = document.getElementById('react-' + e.id);  if (rb) rb.disabled = p < 25
+      })
+    }
+
+    function render(state) {
+      const paused = state.fatePaused || state.dmPaused
+      const banner = document.getElementById('banner')
+      banner.classList.toggle('visible', paused)
+      if (paused) {
+        document.getElementById('banner-text').textContent = state.fatePaused ? '⚡ Fate Timer Expired' : '⏸ Timers Paused'
+        document.getElementById('continue-btn').style.display = state.fatePaused ? '' : 'none'
+      }
+      const fp = pct(state.fate.current, state.fate.duration)
+      document.getElementById('fate-bar').style.width = fp + '%'
+      document.getElementById('fate-time').textContent = fmt(state.fate.current)
+
+      const sig = entitySig(state.entities)
+      if (sig !== lastEntitySig) { rebuildCards(state.entities); lastEntitySig = sig }
+      else { updateCards(state.entities) }
+    }
+
+    function addNPC(npcType) {
+      const input = document.getElementById('npc-name')
+      const name = input.value.trim()
+      if (!name) return
+      send({ type: 'dm:addNPC', name, npcType })
+      input.value = ''
+    }
+
+    function confirmReset() {
+      if (confirm('Reset all combat? This clears all NPCs and players.')) send({ type: 'dm:reset' })
+    }
+
+    document.getElementById('fate-dur').addEventListener('change', e => {
+      const secs = parseInt(e.target.value)
+      if (secs > 0) send({ type: 'dm:setFateDuration', seconds: secs })
+    })
+    document.getElementById('fate-bar-wrap').addEventListener('click', () => send({ type: 'tap:fate' }))
+    document.getElementById('npc-name').addEventListener('keydown', e => { if (e.key === 'Enter') addNPC('monster') })
+    connect()
+  </script>
+</body>
+</html>
