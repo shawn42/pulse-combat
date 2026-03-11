@@ -11,6 +11,7 @@ function lerpState(a, b, t) {
     entities: b.entities.map(e => {
       const ea = a.entities.find(x => x.id === e.id)
       if (!ea) return e
+      if (!ea.timer || !e.timer) return e
       return { ...e, timer: { ...e.timer, current: lerp(ea.timer.current, e.timer.current, t) } }
     })
   }

@@ -79,6 +79,7 @@
       function sendAction(type) { if (playerEntity) send({ type, id: playerEntity.id }) }
 
       function render(state) {
+        if (!state || !state.fate) return
         document.getElementById('banner').classList.toggle('visible', state.fatePaused || state.dmPaused)
         const fp = pct(state.fate.current, state.fate.duration)
         document.getElementById('fate-bar').style.width = fp + '%'

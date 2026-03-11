@@ -171,6 +171,7 @@
     }
 
     function render(state) {
+      if (!state || !state.fate) return
       const paused = state.fatePaused || state.dmPaused
       const banner = document.getElementById('banner')
       banner.classList.toggle('visible', paused)
