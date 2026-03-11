@@ -56,7 +56,7 @@
 
   <script src="/shared.js"></script>
   <script>
-    const rawName = location.pathname.slice(1)
+    const rawName = location.pathname.replace(/^\/player\//, '')
     const playerName = decodeURIComponent(rawName)
 
     // Validate player name: must be non-empty and contain only safe characters

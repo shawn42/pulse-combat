@@ -91,7 +91,7 @@
 
     function join() {
       const name = document.getElementById('name-input').value.trim()
-      if (name) location.href = '/' + encodeURIComponent(name)
+      if (name) location.href = '/player/' + encodeURIComponent(name)
     }
     document.getElementById('name-input').addEventListener('keydown', e => { if (e.key === 'Enter') join() })
 
