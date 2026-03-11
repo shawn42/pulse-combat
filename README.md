@@ -4,6 +4,12 @@
 
 A real-time combat timer app for the Chaos Pulse variant of D&D 5e. Built with [Bun](https://bun.sh) + [Elysia](https://elysiajs.com).
 
+## Screenshots
+
+| Join | DM Control | Player (desktop) | Player (mobile) |
+|---|---|---|---|
+| [![Join screen](docs/screenshots/summary-web.png)](docs/screenshots/summary-web.png) | [![DM view](docs/screenshots/dm-web.png)](docs/screenshots/dm-web.png) | [![Player desktop](docs/screenshots/player-web.png)](docs/screenshots/player-web.png) | [![Player mobile](docs/screenshots/player-phone.png)](docs/screenshots/player-phone.png) |
+
 ## What It Does
 
 Replaces turn-based initiative with simultaneous energy bars. The DM controls the session from one screen; players join from their own devices and tap buttons when their energy is ready.
