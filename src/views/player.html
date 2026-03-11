@@ -27,6 +27,15 @@
     .btn-react { background: #1e3a5f; color: #93c5fd; }
     .leave-btn { width: 100%; padding: 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; background: #7f1d1d; color: #fca5a5; margin-top: auto; }
     .error-msg { background: #7f1d1d; color: #fca5a5; text-align: center; padding: 20px; border-radius: 10px; font-weight: bold; font-size: 16px; margin: 40px auto; max-width: 360px; }
+    .mini-section-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin: 8px 0 4px; }
+    .mini-section-label:first-child { margin-top: 0; }
+    .mini-row { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
+    .mini-name { font-size: 11px; color: #888; min-width: 80px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mini-name.me { color: #a78bfa; font-weight: bold; }
+    .mini-bar-wrap { flex: 1; background: #222; border-radius: 3px; overflow: hidden; height: 7px; }
+    .mini-bar { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #0369a1, #38bdf8); }
+    .mini-bar.full { background: linear-gradient(90deg, #15803d, #4ade80); }
+    .mini-time { font-size: 10px; color: #555; min-width: 30px; text-align: right; }
   </style>
 </head>
 <body>
@@ -52,6 +61,11 @@
     </div>
   </div>
 
+  <div id="all-timers" class="panel" style="display:none">
+    <div class="panel-title">All Timers</div>
+    <div id="mini-list"></div>
+  </div>
+
   <button class="leave-btn" onclick="leave()">Leave Combat</button>
 
   <script src="/shared.js"></script>
@@ -68,9 +82,44 @@
 
       let playerEntity = null
       let getWs
+      let lastMiniSig = ''
 
       function fmt(s) { return Math.max(0, s).toFixed(1) + 's' }
       function pct(cur, dur) { return Math.min(100, (cur / dur) * 100) }
+      function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+      function miniSig(entities) { return entities.map(e => e.id + ':' + e.type).join(',') }
+
+      function miniRowHTML(e) {
+        const isMe = e.name === playerName && e.type === 'player'
+        return `<div class="mini-row" id="mrow-${escapeHtml(e.id)}">
+          <span class="mini-name${isMe ? ' me' : ''}">${escapeHtml(e.name)}</span>
+          <div class="mini-bar-wrap"><div id="mbar-${escapeHtml(e.id)}" class="mini-bar" style="width:0%"></div></div>
+          <span id="mtime-${escapeHtml(e.id)}" class="mini-time">0s</span>
+        </div>`
+      }
+
+      function miniGroupHTML(label, entities) {
+        if (!entities.length) return ''
+        return `<div class="mini-section-label">${label}</div>` + entities.map(miniRowHTML).join('')
+      }
+
+      function rebuildMini(entities) {
+        document.getElementById('mini-list').innerHTML =
+          miniGroupHTML('Monsters', entities.filter(e => e.type === 'monster')) +
+          miniGroupHTML('Minions', entities.filter(e => e.type === 'minion')) +
+          miniGroupHTML('Players', entities.filter(e => e.type === 'player'))
+      }
+
+      function updateMini(entities) {
+        entities.forEach(e => {
+          if (!e || !e.timer || e.timer.current == null || e.timer.duration == null) return
+          const p = pct(e.timer.current, e.timer.duration)
+          const bar = document.getElementById('mbar-' + e.id)
+          const time = document.getElementById('mtime-' + e.id)
+          if (bar) { bar.style.width = p + '%'; bar.className = 'mini-bar' + (p >= 100 ? ' full' : '') }
+          if (time) time.textContent = fmt(e.timer.current)
+        })
+      }
 
       function send(action) {
         const ws = getWs ? getWs() : null
@@ -100,6 +149,16 @@
           document.getElementById('react-btn').disabled = p < 25
         } else {
           panel.style.display = 'none'
+        }
+
+        const allTimers = document.getElementById('all-timers')
+        if (state.entities.length) {
+          allTimers.style.display = ''
+          const sig = miniSig(state.entities)
+          if (sig !== lastMiniSig) { rebuildMini(state.entities); lastMiniSig = sig }
+          else { updateMini(state.entities) }
+        } else {
+          allTimers.style.display = 'none'
         }
       }
 
