@@ -62,13 +62,13 @@ export function addEntity(
     return state
   }
   const playerCount = state.entities.filter(e => e.type === 'player').length
-  const duration = type === 'monster' ? Math.max(1, 15 - playerCount) : 15
+  const duration = type === 'monster' ? Math.max(10, 15 - playerCount) : 15
   const current = (state.running && (type === 'monster' || type === 'minion')) ? duration : 0
   let entities = [...state.entities, { id, name, type, timer: { duration, current: current } }]
   if (type === 'player') {
     entities = entities.map(e =>
       e.type === 'monster'
-        ? { ...e, timer: { ...e.timer, duration: Math.max(1, e.timer.duration - 1) } }
+        ? { ...e, timer: { ...e.timer, duration: Math.max(10, e.timer.duration - 1) } }
         : e
     )
   }
@@ -82,7 +82,7 @@ export function removeEntity(state: CombatState, id: string): CombatState {
   if (entity.type === 'player') {
     entities = entities.map(e =>
       e.type === 'monster'
-        ? { ...e, timer: { ...e.timer, duration: e.timer.duration + 1 } }
+        ? { ...e, timer: { ...e.timer, duration: Math.min(15, e.timer.duration + 1) } }
         : e
     )
   }
