@@ -53,14 +53,14 @@
 <body>
   <div id="banner" class="banner">
     <span id="banner-text">⚡ Timers Paused</span>
-    <button id="continue-btn" class="continue-btn" style="display:none" onclick="send({type:'dm:continue'})">▶ Continue</button>
+    <button id="continue-btn" class="continue-btn" style="display:none" data-action="dm:continue">▶ Continue</button>
   </div>
 
   <div class="top-bar">
     <span class="top-title">⚔ DM Control</span>
-    <button class="top-btn btn-start" onclick="send({type:'dm:start'})">▶ Start</button>
-    <button class="top-btn btn-pause" onclick="send({type:'dm:pause'})">⏸ Pause</button>
-    <button class="top-btn btn-reset" onclick="confirmReset()">↺ Reset</button>
+    <button class="top-btn btn-start" data-action="dm:start">▶ Start</button>
+    <button class="top-btn btn-pause" data-action="dm:pause">⏸ Pause</button>
+    <button class="top-btn btn-reset" data-action="dm:reset">↺ Reset</button>
   </div>
 
   <div class="main">
@@ -77,59 +77,55 @@
         <div class="panel-title">Add NPC</div>
         <input id="npc-name" type="text" class="add-npc-input" placeholder="NPC name...">
         <div class="add-npc-btns">
-          <button class="btn-monster" onclick="addNPC('monster')">+ Monster</button>
-          <button class="btn-minion" onclick="addNPC('minion')">+ Minion</button>
+          <button class="btn-monster" data-action="addNPC" data-npc-type="monster">+ Monster</button>
+          <button class="btn-minion" data-action="addNPC" data-npc-type="minion">+ Minion</button>
         </div>
       </div>
     </div>
     <div id="right-col"></div>
   </div>
 
+  <script src="/shared.js"></script>
   <script>
-    let ws, lastEntitySig = '', prevState = null, nextState = null, lastTick = 0
-    function lerp(a, b, t) { return a + (b - a) * t }
-    function lerpState(a, b, t) {
-      if (!a) return b
-      return {
-        ...b,
-        fate: { ...b.fate, current: lerp(a.fate.current, b.fate.current, t) },
-        entities: b.entities.map(e => {
-          const ea = a.entities.find(x => x.id === e.id)
-          if (!ea) return e
-          return { ...e, timer: { ...e.timer, current: lerp(ea.timer.current, e.timer.current, t) } }
-        })
-      }
+    let lastEntitySig = ''
+    let getWs
+
+    function send(action) {
+      const ws = getWs ? getWs() : null
+      if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(action))
     }
-    function connect() {
-      ws = new WebSocket('ws://' + location.host + '/ws')
-      ws.onmessage = e => {
-        const m = JSON.parse(e.data)
-        if (m.type === 'state') { prevState = nextState ?? m.data; nextState = m.data; lastTick = performance.now() }
-      }
-      ws.onclose = () => setTimeout(connect, 1000)
-    }
-    function animate() { if (nextState) { const alpha = Math.min(1, (performance.now() - lastTick) / 100); render(lerpState(prevState, nextState, alpha)) } requestAnimationFrame(animate) }
-    requestAnimationFrame(animate)
-    function send(action) { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(action)) }
+
     function fmt(s) { return Math.max(0, s).toFixed(1) + 's' }
     function pct(cur, dur) { return Math.min(100, (cur / dur) * 100) }
     function entitySig(entities) { return entities.map(e => e.id + ':' + e.timer.duration).join(',') }
 
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+    }
+
     function entityCardHTML(e) {
-      return `<div class="entity-card" id="card-${e.id}">
+      if (!e || !e.timer || e.timer.current == null || e.timer.duration == null) return ''
+      const safeId = escapeHtml(e.id)
+      const safeName = escapeHtml(e.name)
+      return `<div class="entity-card" id="card-${safeId}">
         <div class="entity-header">
-          <span class="entity-name">${e.name}</span>
-          <button class="remove-btn" onclick="send({type:'dm:removeNPC',id:'${e.id}'})">✕ remove</button>
+          <span class="entity-name">${safeName}</span>
+          <button class="remove-btn" data-action="dm:removeNPC" data-id="${safeId}">✕ remove</button>
         </div>
-        <div class="dur-row">Dur: <input id="dur-${e.id}" type="number" class="dur-input" value="${e.timer.duration}" min="1">s</div>
-        <div class="bar-wrap" onclick="send({type:'tap:energy',id:'${e.id}'})">
-          <div id="bar-${e.id}" class="bar energy-bar" style="width:0%"></div>
+        <div class="dur-row">Dur: <input id="dur-${safeId}" type="number" class="dur-input" value="${escapeHtml(e.timer.duration)}" min="1">s</div>
+        <div class="bar-wrap" data-action="tap:energy" data-id="${safeId}">
+          <div id="bar-${safeId}" class="bar energy-bar" style="width:0%"></div>
         </div>
-        <div id="time-${e.id}" class="time-label">0s</div>
-        <button id="action-${e.id}" class="action-btn" disabled onclick="send({type:'tap:action',id:'${e.id}'})">ACTION</button>
+        <div id="time-${safeId}" class="time-label">0s</div>
+        <button id="action-${safeId}" class="action-btn" disabled data-action="tap:action" data-id="${safeId}">ACTION</button>
         <div class="sub-btns">
-          <button id="bonus-${e.id}" class="sub-btn btn-bonus" disabled onclick="send({type:'tap:bonus',id:'${e.id}'})">Bonus/Move</button>
-          <button id="react-${e.id}" class="sub-btn btn-react" disabled onclick="send({type:'tap:react',id:'${e.id}'})">React</button>
+          <button id="bonus-${safeId}" class="sub-btn btn-bonus" disabled data-action="tap:bonus" data-id="${safeId}">Bonus/Move</button>
+          <button id="react-${safeId}" class="sub-btn btn-react" disabled data-action="tap:react" data-id="${safeId}">React</button>
         </div>
       </div>`
     }
@@ -137,7 +133,7 @@
     function groupHTML(label, entities) {
       if (!entities.length) return ''
       return `<div class="entity-section">
-        <div class="section-label">${label}</div>
+        <div class="section-label">${escapeHtml(label)}</div>
         <div class="entity-grid">${entities.map(entityCardHTML).join('')}</div>
       </div>`
     }
@@ -148,6 +144,7 @@
         groupHTML('Minions', entities.filter(e => e.type === 'minion')) +
         groupHTML('Players', entities.filter(e => e.type === 'player'))
       entities.forEach(e => {
+        if (!e || !e.id) return
         const input = document.getElementById('dur-' + e.id)
         if (input) input.addEventListener('change', () => {
           const secs = parseInt(input.value)
@@ -158,6 +155,7 @@
 
     function updateCards(entities) {
       entities.forEach(e => {
+        if (!e || !e.id || !e.timer || e.timer.current == null || e.timer.duration == null) return
         const p = pct(e.timer.current, e.timer.duration)
         const bar = document.getElementById('bar-' + e.id)
         if (bar) {
@@ -201,13 +199,37 @@
       if (confirm('Reset all combat? This clears all NPCs and players.')) send({ type: 'dm:reset' })
     }
 
+    // Event delegation for data-action buttons and clickable elements
+    document.addEventListener('click', function(evt) {
+      const target = evt.target.closest('[data-action]')
+      if (!target) return
+      const action = target.dataset.action
+      const id = target.dataset.id
+
+      switch (action) {
+        case 'dm:start':   send({ type: 'dm:start' }); break
+        case 'dm:pause':   send({ type: 'dm:pause' }); break
+        case 'dm:reset':   confirmReset(); break
+        case 'dm:continue': send({ type: 'dm:continue' }); break
+        case 'dm:removeNPC': if (id) send({ type: 'dm:removeNPC', id }); break
+        case 'tap:energy': if (id) send({ type: 'tap:energy', id }); break
+        case 'tap:action': if (id) send({ type: 'tap:action', id }); break
+        case 'tap:bonus':  if (id) send({ type: 'tap:bonus', id }); break
+        case 'tap:react':  if (id) send({ type: 'tap:react', id }); break
+        case 'addNPC':     addNPC(target.dataset.npcType); break
+      }
+    })
+
     document.getElementById('fate-dur').addEventListener('change', e => {
       const secs = parseInt(e.target.value)
       if (secs > 0) send({ type: 'dm:setFateDuration', seconds: secs })
     })
     document.getElementById('fate-bar-wrap').addEventListener('click', () => send({ type: 'tap:fate' }))
     document.getElementById('npc-name').addEventListener('keydown', e => { if (e.key === 'Enter') addNPC('monster') })
-    connect()
+
+    getWs = connect(function(getState) {
+      animate(getState, render)
+    })
   </script>
 </body>
 </html>

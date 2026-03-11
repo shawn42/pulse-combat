@@ -40,6 +40,7 @@ function dispatch(msg: unknown): void {
 export const app = new Elysia()
   .get('/', () => Bun.file('src/views/shared.html'))
   .get('/dm', () => Bun.file('src/views/dm.html'))
+  .get('/shared.js', () => Bun.file('src/views/shared.js'))
   .ws('/ws', {
     open(ws) { addClient(ws) },
     close(ws) { removeClient(ws) },
