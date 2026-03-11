@@ -1,1 +1,123 @@
-<!DOCTYPE html><html><body><h1>Player</h1></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>⚔ Player</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0d0d0d; color: #ccc; font-family: system-ui, sans-serif; min-height: 100dvh; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+    h1 { color: #a78bfa; font-size: 20px; text-align: center; }
+    .banner { display: none; background: #7f1d1d; color: #fca5a5; text-align: center; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 16px; }
+    .banner.visible { display: block; }
+    .panel { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 12px; }
+    .panel-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 8px; }
+    .bar-wrap { background: #222; border-radius: 8px; overflow: hidden; height: 16px; margin: 6px 0; cursor: pointer; }
+    .bar { height: 100%; border-radius: 8px; transition: width 150ms linear; }
+    .fate-bar { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+    .energy-bar { background: linear-gradient(90deg, #0369a1, #38bdf8); }
+    .energy-bar.full { background: linear-gradient(90deg, #15803d, #4ade80); }
+    .time-label { text-align: center; font-size: 12px; color: #666; margin-top: 3px; }
+    .action-btn { width: 100%; padding: 20px; font-size: 18px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 10px; background: #1d4ed8; color: white; transition: opacity 200ms; }
+    .action-btn:disabled { opacity: 0.3; cursor: default; }
+    .sub-btns { display: flex; gap: 8px; margin-top: 8px; }
+    .sub-btn { flex: 1; padding: 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: opacity 200ms; }
+    .sub-btn:disabled { opacity: 0.3; cursor: default; }
+    .btn-bonus { background: #0f4c75; color: #7dd3fc; }
+    .btn-react { background: #1e3a5f; color: #93c5fd; }
+    .leave-btn { width: 100%; padding: 14px; font-size: 14px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; background: #7f1d1d; color: #fca5a5; margin-top: auto; }
+  </style>
+</head>
+<body>
+  <div id="banner" class="banner">⚡ Timers Paused</div>
+  <h1 id="player-name">⚔</h1>
+
+  <div class="panel">
+    <div class="panel-title">⚡ Fate Timer</div>
+    <div class="bar-wrap"><div id="fate-bar" class="bar fate-bar" style="width:100%"></div></div>
+    <div id="fate-time" class="time-label">30s</div>
+  </div>
+
+  <div id="player-panel" class="panel" style="display:none">
+    <div class="panel-title">Your Timer</div>
+    <div class="bar-wrap" id="energy-wrap">
+      <div id="energy-bar" class="bar energy-bar" style="width:0%"></div>
+    </div>
+    <div id="energy-time" class="time-label">0s / 15s</div>
+    <button id="action-btn" class="action-btn" disabled onclick="sendAction('tap:action')">ACTION</button>
+    <div class="sub-btns">
+      <button id="bonus-btn" class="sub-btn btn-bonus" disabled onclick="sendAction('tap:bonus')">Bonus / Move</button>
+      <button id="react-btn" class="sub-btn btn-react" disabled onclick="sendAction('tap:react')">React</button>
+    </div>
+  </div>
+
+  <button class="leave-btn" onclick="leave()">Leave Combat</button>
+
+  <script>
+    const playerName = decodeURIComponent(location.pathname.slice(1))
+    document.getElementById('player-name').textContent = '⚔ ' + playerName
+    let ws, playerEntity = null, prevState = null, nextState = null, lastTick = 0
+    function lerp(a, b, t) { return a + (b - a) * t }
+    function lerpState(a, b, t) {
+      if (!a) return b
+      return {
+        ...b,
+        fate: { ...b.fate, current: lerp(a.fate.current, b.fate.current, t) },
+        entities: b.entities.map(e => {
+          const ea = a.entities.find(x => x.id === e.id)
+          if (!ea) return e
+          return { ...e, timer: { ...e.timer, current: lerp(ea.timer.current, e.timer.current, t) } }
+        })
+      }
+    }
+    function connect() {
+      ws = new WebSocket('ws://' + location.host + '/ws')
+      ws.onmessage = e => {
+        const m = JSON.parse(e.data)
+        if (m.type === 'state') { prevState = nextState ?? m.data; nextState = m.data; lastTick = performance.now() }
+      }
+      ws.onclose = () => setTimeout(connect, 1000)
+    }
+    function animate() { if (nextState) { const alpha = Math.min(1, (performance.now() - lastTick) / 100); render(lerpState(prevState, nextState, alpha)) } requestAnimationFrame(animate) }
+    requestAnimationFrame(animate)
+    function send(action) { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify(action)) }
+    function sendAction(type) { if (playerEntity) send({ type, id: playerEntity.id }) }
+    function fmt(s) { return Math.max(0, s).toFixed(1) + 's' }
+    function pct(cur, dur) { return Math.min(100, (cur / dur) * 100) }
+
+    function render(state) {
+      document.getElementById('banner').classList.toggle('visible', state.fatePaused || state.dmPaused)
+      const fp = pct(state.fate.current, state.fate.duration)
+      document.getElementById('fate-bar').style.width = fp + '%'
+      document.getElementById('fate-time').textContent = fmt(state.fate.current)
+
+      playerEntity = state.entities.find(e => e.name === playerName && e.type === 'player') ?? null
+      const panel = document.getElementById('player-panel')
+
+      if (playerEntity) {
+        panel.style.display = ''
+        const p = pct(playerEntity.timer.current, playerEntity.timer.duration)
+        const bar = document.getElementById('energy-bar')
+        bar.style.width = p + '%'
+        bar.className = 'bar energy-bar' + (p >= 100 ? ' full' : '')
+        document.getElementById('energy-time').textContent = fmt(playerEntity.timer.current) + ' / ' + fmt(playerEntity.timer.duration)
+        document.getElementById('action-btn').disabled = p < 100
+        document.getElementById('bonus-btn').disabled = p < 50
+        document.getElementById('react-btn').disabled = p < 25
+      } else {
+        panel.style.display = 'none'
+      }
+    }
+
+    function leave() {
+      send({ type: 'player:leave', name: playerName })
+      location.href = '/'
+    }
+
+    document.getElementById('energy-wrap').addEventListener('click', () => {
+      if (playerEntity) send({ type: 'tap:energy', id: playerEntity.id })
+    })
+    connect()
+  </script>
+</body>
+</html>
