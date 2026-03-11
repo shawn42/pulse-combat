@@ -52,11 +52,15 @@ export function dmContinue(state: CombatState): CombatState {
   }
 }
 
-export function addEntity(state: CombatState, name: string, type: EntityType): CombatState {
+export function addEntity(
+  state: CombatState,
+  name: string,
+  type: EntityType,
+  id: string = crypto.randomUUID()
+): CombatState {
   if (type === 'player' && state.entities.some(e => e.name === name && e.type === 'player')) {
     return state
   }
-  const id = crypto.randomUUID()
   let entities = [...state.entities, { id, name, type, timer: { duration: 15, current: 0 } }]
   if (type === 'player') {
     entities = entities.map(e =>
@@ -96,7 +100,7 @@ export function setEntityDuration(state: CombatState, id: string, seconds: numbe
   return {
     ...state,
     entities: state.entities.map(e =>
-      e.id === id ? { ...e, timer: { ...e.timer, duration: seconds } } : e
+      e.id === id ? { ...e, timer: { duration: seconds, current: Math.min(e.timer.current, seconds) } } : e
     ),
   }
 }
