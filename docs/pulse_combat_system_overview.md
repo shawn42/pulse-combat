@@ -75,6 +75,28 @@ Non-minion enemies may have Legendary Resistance (LR) uses, determined by CR:
 
 ---
 
+## Conditions
+
+**Default: every condition clears the moment the next Fate cycle starts** — i.e. when the DM taps **Continue** and timers resume, not at the pause itself. Paralyzed, Restrained, Frightened, Charmed, Stunned, Dazed, etc. all last at most one Fate cycle. **Exception: Prone does not auto-clear (for now).**
+
+Because the condition is still live for the entire Fate pause, the DM must **"finish the round" before hitting Continue**: resolve every currently-active affliction one last time — for NPCs and PCs alike (ongoing damage, forced saves, whatever the effect calls for) — before it clears. Conditions ride out the pause, then clear; they don't evaporate the instant the bell rings.
+
+**Scope: this rule covers Conditions only** (the 5e conditions list — Paralyzed, Restrained, Frightened, Charmed, Stunned, Dazed, etc.). It does **not** apply to diseases, curses (e.g. lycanthropy from a wererat's bite), or other long-duration afflictions that were never turn-scoped in 5e to begin with — those keep their own real-world/story-scale duration and are unaffected by the Fate timer entirely.
+
+This is a deliberately broad default rather than a per-spell or per-ability ruling — it avoids needing bespoke timing logic for every condition-inflicting spell or feature. A useful side effect: it bounds any real-time "stacking" problem (e.g. Divine Smite or Ensnaring Strike against a paralyzed target) to whatever a character can land within one Fate cycle's worth of actions, since the vulnerable window can't outlive the cycle.
+
+If live play shows this over-nerfs a specific condition or ability (something that's supposed to matter longer than ~30s), track it in `pulse_combat_live_test_questions.md` and add a per-condition exception there — don't rework the default rule itself for one case.
+
+---
+
+## Sneak Attack
+
+**Once per Fate cycle**, regardless of which action type the qualifying hit comes from — full action, bonus action (e.g. an off-hand attack from Two-Weapon Fighting), or reaction (an opportunity attack).
+
+5e's "once per turn" text has no clean Pulse equivalent: bonus actions (50% energy) and reactions (25% energy) refill much faster than the full-action energy bar (see Actions above), so without an explicit cap a Rogue could stack Sneak Attack onto every qualifying hit in a cycle — main attack, off-hand attack, and any opportunity attacks — instead of just one. Capping it per Fate cycle closes that regardless of which action type triggers it.
+
+---
+
 ## Spells & Duration
 
 The core rule: **"until the end of your next turn" becomes "until the next Fate pause."**
@@ -82,7 +104,7 @@ The core rule: **"until the end of your next turn" becomes "until the next Fate 
 | Spell Type | Handling |
 |---|---|
 | Damage spells | Play as written |
-| Control spells (Hold Person, Banishment, etc.) | Last until next Fate pause; single save on initial effect; LR can negate |
+| Control spells (Hold Person, Banishment, etc.) | Last until next Fate pause (see Conditions above); single save on initial effect; LR can negate |
 | Concentration buffs/debuffs | Last until next Fate pause or concentration ends |
 | Counterspell | One success stops the spell; all casters who attempted spend a token |
 | Healing | Works normally |
@@ -94,12 +116,20 @@ Spell tokens physically limit per-encounter uses and track ongoing effects (e.g.
 
 ## Minions
 
-Minions are fast to run and fast to die:
+Minions follow the **Flee, Mortals!** (MCDM) minion rules, adapted directly rather than reinvented:
 
-- Low HP (5–10), rollover damage applies
-- 15s energy timer, unaffected by party size
-- No Legendary Resistance
-- Tracked with HP beads; DM removes beads as damage lands
+- **Instant Death:** a minion dies immediately from any damage dealt by a successful weapon attack, or on a failed saving throw — the amount doesn't matter for a single-target hit.
+- **Area Effects:** an AoE spell only kills a minion if its damage equals or exceeds that minion's printed max HP (max HP still matters — see Overkill below).
+- **Simplified Math:** no fluctuating health pool. A minion is alive or dead; there's no "wounded" state to track between hits.
+- **Average Damage:** minions' own attacks use flat average damage instead of rolling per swing, to keep large minion counts fast to run.
+- **Group Attacks:** the DM can resolve several minions' attacks as a single action, the same way one monster acts.
+- **Overkill / Cleave:** if damage against one minion exceeds its max HP, the excess (`damage − target's max HP`) carries over and can kill an **adjacent** minion, cascading further if excess remains. One big swing can chain through several minions.
+
+15s energy timer, unaffected by party size. No Legendary Resistance. Tracked with HP beads; DM removes beads as damage lands (beads still matter for the Overkill math and the AoE "equals or exceeds max HP" check, even though a minion never sits at partial HP from a normal hit).
+
+**Open for Pulse specifically (not covered by the source rule):**
+- "Adjacent" is built for a grid; Pulse plays gridless with tactile minis. Needs an operational definition — nearest mini to the target? any minion in the same DM-grouped batch (ties to Group Attacks above)? Not yet decided.
+- Does Overkill cleave carry across multiple hits within one Multiattack action, or does each hit's excess get calculated and discarded independently? Not decided.
 
 ---
 
@@ -139,9 +169,10 @@ Physical bead counters work well at the table:
 2. Hit **Start** — all timers begin filling
 3. Players act as their energy allows; DM taps NPC actions as timers fill
 4. When Fate fires, add new enemies, narrate, resolve death saves
-5. Hit **Continue** to resume — any NPCs just added enter with full energy
-6. Apply LR (Bonus action tap) when a control spell would otherwise lock out a boss
-7. Adjust NPC HP and timer duration mid-encounter if needed to maintain tension
+5. Before hitting Continue, resolve any still-active conditions one last time for every creature — PCs and NPCs — then clear them
+6. Hit **Continue** to resume — any NPCs just added enter with full energy
+7. Apply LR (Bonus action tap) when a control spell would otherwise lock out a boss
+8. Adjust NPC HP and timer duration mid-encounter if needed to maintain tension
 
 ---
 
