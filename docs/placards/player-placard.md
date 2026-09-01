@@ -15,7 +15,7 @@
 - AC + all 6 saving throw bonuses (proficient ones marked)
 - Spell slot tracker — one chip per slot, by level
   - Multiclass casters may need multiple labeled pools with different recovery rules (e.g. Sorcerer long-rest slots vs. Warlock short-rest Pact Magic) — confirmed real case, not anticipated in the original spec. See "Reference character validation" below.
-- Max HP printed — current HP tracked in a separate bead bowl, not on the mat
+- Max HP as a printed numbered track (1 to max) directly on the mat, with a sliding marker/clip tracking current HP — no separate bead bowl (superseded 2026-09-01, see Decisions log)
 - Precomputed energy timer duration (DEX-adjusted)
 
 ## Explicitly excluded / not tracked
@@ -40,6 +40,7 @@ Not covered by the shared bin: **exhaustion** — dropped, no tracking mechanism
 - 2026-08-19 — Concentration tracked via the shared condition bin, no dedicated marker.
 - 2026-08-19 — Exhaustion dropped from scope entirely.
 - 2026-08-19 — Advantage/disadvantage tracked via an interim generic condition chip.
+- 2026-09-01 — **Reverses the 2026-08-19 bead-bowl call.** Current HP moves onto the mat as a printed track with a sliding marker, instead of a separate bead bowl. Reasoning: mobs already use a loose bead bin players grab from directly ("hungry hungry hippos" style, self-service, trusted) and that works fine for mobs — but a personal loose bin didn't feel right for a player's own HP, and bowls/dials/dice/paper alternatives are all *private* numbers nobody else at the table can read at a glance. A printed track keeps the "visible position, no arithmetic beyond one subtraction" property of beads without a spillable bin. Marked "for now" — not yet physically prototyped (does a slider stay put on a card during actual play?), worth a live-test pass. See `pulse_combat_live_test_questions.md`.
 
 ## To discuss (open design tensions)
 

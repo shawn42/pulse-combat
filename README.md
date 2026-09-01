@@ -10,6 +10,12 @@ A real-time combat timer app for the Chaos Pulse variant of D&D 5e. Built with [
 |---|---|---|---|
 | [![Join screen](docs/screenshots/summary-web.png)](docs/screenshots/summary-web.png) | [![DM view](docs/screenshots/dm-web.png)](docs/screenshots/dm-web.png) | [![Player desktop](docs/screenshots/player-web.png)](docs/screenshots/player-web.png) | [![Player mobile](docs/screenshots/player-phone.png)](docs/screenshots/player-phone.png) |
 
+## At the Table
+
+[![Example table setup](docs/screenshots/example-table.jpg)](docs/screenshots/example-table.jpg)
+
+The app runs alongside physical placards, bead pools, and condition/spell chips — see the [Chaos Pulse Combat System Overview](docs/pulse_combat_system_overview.md) for the full physical-component design.
+
 ## What It Does
 
 Replaces turn-based initiative with simultaneous energy bars. The DM controls the session from one screen; players join from their own devices and tap buttons when their energy is ready.

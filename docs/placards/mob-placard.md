@@ -36,10 +36,10 @@
 - 2026-08-19 — Save line prints raw modifier only, not a precomputed passive-save value.
 - 2026-08-19 — No bloodied/enrage threshold printed — DM eyeballs beads instead.
 - 2026-08-19 — Legendary Resistance uses, party-size-adjusted enemy energy rate, and minion rollover damage all stay rules-only — none of them need a printed table artifact.
+- 2026-09-01 — **Save resolution mechanic locked in: fixed/passive (`10 + mod`), for now.** Chosen over pre-rolled batch (adds session prep) and a live-respin app feature (needs new app work, and raises its own question about whether the value should be player-visible) because it costs zero additional build work and is the fastest option for batch-resolving several simultaneous mob saves at once. Doesn't conflict with the 2026-08-19 call to print the raw modifier rather than a precomputed number — that was about what's printed, this is about how the save gets resolved when needed. Caveat: this trades away randomness on the monster side of saves (a given mob will always pass or fail against a fixed DC), which may read as too deterministic at the table — **flagged for reassessment after a real playtest**, see `pulse_combat_live_test_questions.md`.
 
 ## To discuss (open design tensions)
 
-- **Save resolution mechanic** — fixed/passive (`10+mod`) vs. pre-rolled batch vs. a live respin-on-use value (app-driven: a value sits visible until that save is actually invoked, then randomizes for next time). Currently the card just prints the modifier regardless of which way this goes, but the choice affects whether a companion app feature is needed.
 - **Minion Overkill "adjacency" on a gridless table** — the Flee, Mortals! (MCDM) minion rules this system uses key the cleave/overkill mechanic to the target's *adjacent* minion, which assumes a grid. Pulse plays gridless with tactile minis, so "adjacent" needs its own definition — nearest mini, or any minion in the same DM-grouped batch? See `pulse_combat_system_overview.md` → Minions.
 
 ## Deferred to future artifacts
@@ -52,3 +52,57 @@
 ## Reference monster validation
 
 - Mocked up against a real stat block: Goblin Boss, 2024 Monster Manual (XMM) — via 5e.tools, including official art.
+- Mocked up against the Rat King encounter trio (Boss/Lieutenant/Minion), the same three monsters used for `dm-placard.md`'s DM-facing cards and the playtest build list — first time all three tiers of the universal template got built as public-facing cards together:
+
+```
+┌────────────────────────────────────────────────┐
+│  ┌──────────┐  RAT KING                         │
+│  │  [ art ] │  Large Aberration — CR 8           │
+│  └──────────┘                                   │
+├────────────────────────────────────────────────┤
+│  AC 17                Max HP 170                │
+├────────────────────────────────────────────────┤
+│  SAVING THROWS              (● = proficient)    │
+│   STR +5       DEX -1        CON +3             │
+│   INT +2       WIS +2        CHA +5             │
+├────────────────────────────────────────────────┤
+│  RESIST / VULN / IMMUNE                         │
+│   Immune: Charmed, Frightened                   │
+└────────────────────────────────────────────────┘
+```
+
+```
+┌────────────────────────────────────────────────┐
+│  ┌──────────┐  WERERAT LORD                     │
+│  │  [ art ] │  Large Humanoid (shapechanger)    │
+│  └──────────┘  CR 5                             │
+├────────────────────────────────────────────────┤
+│  AC 13                Max HP 44                 │
+├────────────────────────────────────────────────┤
+│  SAVING THROWS              (● = proficient)    │
+│   STR +3       DEX +3        CON +1             │
+│   INT +1       WIS +1        CHA  0             │
+├────────────────────────────────────────────────┤
+│  RESIST / VULN / IMMUNE                         │
+│   (none listed in source stat block)            │
+└────────────────────────────────────────────────┘
+```
+
+```
+┌────────────────────────────────────────────────┐
+│  ┌──────────┐  GIANT RAT  (minion)              │
+│  │  [ art ] │  Small Beast — CR 1/8              │
+│  └──────────┘                                    │
+├────────────────────────────────────────────────┤
+│  AC 13                Max HP 7                  │
+├────────────────────────────────────────────────┤
+│  SAVING THROWS              (● = proficient)    │
+│   STR -2       DEX ● +5      CON  0             │
+│   INT -4       WIS  0        CHA -3             │
+├────────────────────────────────────────────────┤
+│  RESIST / VULN / IMMUNE                         │
+│   (none)                                        │
+└────────────────────────────────────────────────┘
+```
+
+  One Giant Rat card is enough — all copies on the table are identical, so build one template and print/photocopy as many as minis are in play (see the playtest build list for the actual minion count decision).

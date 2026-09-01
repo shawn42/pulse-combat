@@ -2,6 +2,21 @@
 
 A real-time combat variant for D&D 5e that replaces turn-based initiative with simultaneous energy bars and a DM-controlled Fate Timer. All participants act in real time as their energy allows.
 
+[![Example table setup](screenshots/example-table.jpg)](screenshots/example-table.jpg)
+
+## Related Documents
+
+This page covers the core rules. Everything else lives in these living docs:
+
+- [Spell Audit](pulse_combat_spells.md) — spell-by-spell rulings (what's resolved, what's still open), plus confirmed combat stats for the "arach-neds" party
+- [Live Test Questions](pulse_combat_live_test_questions.md) — provisional "for now" rulings flagged for reassessment once they've actually been played
+- [Playtest Build List](pulse_combat_playtest_build_list.md) — what physically needs to exist before the first live playtest, and every open decision that could still change it
+- [Player Placard](placards/player-placard.md), [Mob Placard](placards/mob-placard.md), [DM Placard](placards/dm-placard.md) — the physical card designs, living outlines with worked examples
+- [Full design conversation archive](archive/chaos_pulse_conversation_export.md) — the source material these docs were distilled from
+- [`chars/`](chars/) — the party's actual character sheets (raw D&D Beyond page saves), used to keep the spell audit and build list grounded in real numbers
+
+*Linkage is intentionally one-way (overview → everything) for now — cross-references between the other docs are still plain filename mentions, not clickable, which keeps updates simpler while these are still living/churning docs. Worth revisiting as the project approaches "launch."*
+
 ---
 
 ## Core Concept
@@ -81,7 +96,7 @@ Non-minion enemies may have Legendary Resistance (LR) uses, determined by CR:
 
 Because the condition is still live for the entire Fate pause, the DM must **"finish the round" before hitting Continue**: resolve every currently-active affliction one last time — for NPCs and PCs alike (ongoing damage, forced saves, whatever the effect calls for) — before it clears. Conditions ride out the pause, then clear; they don't evaporate the instant the bell rings.
 
-**Scope: this rule covers Conditions only** (the 5e conditions list — Paralyzed, Restrained, Frightened, Charmed, Stunned, Dazed, etc.). It does **not** apply to diseases, curses (e.g. lycanthropy from a wererat's bite), or other long-duration afflictions that were never turn-scoped in 5e to begin with — those keep their own real-world/story-scale duration and are unaffected by the Fate timer entirely.
+**Scope: this rule covers Conditions** — the 5e named list (Paralyzed, Restrained, Frightened, Charmed, Stunned, Dazed, etc.) **and any homebrew status effect with the same shape**: attached to a creature, has a duration or "(save ends)" clause. Example: the Rat King's **Jinxed** (roll the indicated die and subtract it from every attack roll or saving throw while it lasts) isn't a PHB-named condition, but it has the same shape, so it gets the same treatment — clears at the next Fate pause instead of tracking its own "attempt a save to end it early" timing. It does **not** apply to diseases, curses (e.g. lycanthropy from a wererat's bite), or other long-duration afflictions that were never turn-scoped in 5e to begin with — those keep their own real-world/story-scale duration and are unaffected by the Fate timer entirely.
 
 This is a deliberately broad default rather than a per-spell or per-ability ruling — it avoids needing bespoke timing logic for every condition-inflicting spell or feature. A useful side effect: it bounds any real-time "stacking" problem (e.g. Divine Smite or Ensnaring Strike against a paralyzed target) to whatever a character can land within one Fate cycle's worth of actions, since the vulnerable window can't outlive the cycle.
 
@@ -97,7 +112,13 @@ If live play shows this over-nerfs a specific condition or ability (something th
 
 ---
 
-## Spells & Duration
+## Companions & Single Summons
+
+A single companion creature (Steel Defender, Find Familiar, etc.) **gets no independent energy timer.** Its owner commands it — Attack, Help, Hide, Dodge, Dash — by spending their own bonus action (50% energy), the same as any other bonus-action ability. The companion gets a reference placard for its own stats (AC, saves, attack) but never its own clock on the table.
+
+This closes design question #6 ("summons and companions can rapidly increase action economy") for the single-companion case: since the companion's action *is* one of the owner's own bonus-action spends, it can never act faster than the owner's single energy bar allows — no doubling, by construction, and no new mechanic invented (vanilla 5e already requires a bonus action to command most companions like this).
+
+This does **not** resolve Conjure Animals or other multi-creature summons — commanding up to eight independent creatures is a much larger question than one companion. But it's a promising lead worth revisiting there: if "one bonus-action command directs exactly one summoned creature" holds for a multi-summon spell too, the same construction that bounds a single companion would also throttle a swarm, without banning the spell outright. See `pulse_combat_spells.md` → Conjure Animals.
 
 The core rule: **"until the end of your next turn" becomes "until the next Fate pause."**
 
