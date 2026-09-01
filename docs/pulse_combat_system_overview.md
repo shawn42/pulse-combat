@@ -156,11 +156,9 @@ Minions follow the **Flee, Mortals!** (MCDM) minion rules, adapted directly rath
 
 ## Health Tracking
 
-Physical bead counters work well at the table:
-
-- **Players:** beads in a small bowl; remove on damage
-- **Minions:** small counters, 1–2 PC hits kills
-- **Boss:** large bead counter (100–250 for high-CR encounters)
+- **Players:** a printed numbered HP track across the top of the placard, with a sliding paperclip marker instead of a bead bowl (see `docs/placards/player-placard.md` → Decisions log, 2026-09-01).
+- **Minions:** small bead counters, 1–2 PC hits kills.
+- **Boss:** large bead counter (100–250 for high-CR encounters).
 
 ---
 
