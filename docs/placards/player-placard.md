@@ -58,5 +58,40 @@ Not covered by the shared bin: **exhaustion** — dropped, no tracking mechanism
 
 ## Reference character validation
 
-- Mocked up against a real character: Arvin (Autognome Warlock 4 / Sorcerer 1) — https://www.dndbeyond.com/characters/165658548
+- Mocked up against a real character: Arvin (Autognome Warlock 5 / Sorcerer 1) — https://www.dndbeyond.com/characters/165658548
 - This surfaced the multiclass two-pool spell slot edge case (Sorcerer long-rest slots vs. Warlock short-rest Pact Magic slots) as a genuine, previously-unanticipated case for the chip-track design.
+- Also the first placard built after the 2026-09-01 HP-track decision — below, showing the track + paperclip in place of the bead bowl.
+
+```
+┌────────────────────────────────────────────────┐
+│  ARVIN                                          │
+│  Autognome — Warlock 5 (Fathomless) /           │
+│                      Sorcerer 1 (Storm Sorcery) │
+├────────────────────────────────────────────────┤
+│  AC 16               Energy Timer: 14s          │
+│                        (15s − 1s, DEX +3)       │
+├────────────────────────────────────────────────┤
+│  HP TRACK  (paperclip slider, 1–44)             │
+│   1    5   10   15   20   25   30   35   40  44 │
+│   •----•----•----•----•----•----•----•----•--🖇 │
+│                               clip at: 44 (full)│
+├────────────────────────────────────────────────┤
+│  SAVING THROWS              (● = proficient)    │
+│   STR -1       DEX +3        CON +2             │
+│   INT  0       WIS ● +3      CHA ● +6           │
+│   (CHA save: +6 further vs. paralyzed/poisoned) │
+├────────────────────────────────────────────────┤
+│  SPELLCASTING                                   │
+│   Warlock ....... Save DC 14    Attack ..... +6 │
+│   Sorcerer ....... Save DC 15    Attack ..... +6│
+│   Tentacle of the Deeps (10ft reach) ........+6 │
+├────────────────────────────────────────────────┤
+│  SPELL SLOTS                                    │
+│   Sorcerer (long rest)                          │
+│     1st  [●] [●]                                │
+│   Warlock — Pact Magic (short rest)             │
+│     3rd  [●] [●]                                │
+└────────────────────────────────────────────────┘
+```
+
+Note the two separate Spell Save DCs (Warlock 14, Sorcerer 15) — a second real multiclass edge case this placard has to handle beyond just the two-pool slot tracker: a caster whose two classes derive different DCs, not just different slot pools.
