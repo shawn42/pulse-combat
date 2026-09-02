@@ -15,7 +15,7 @@
 - AC + all 6 saving throw bonuses (proficient ones marked)
 - Spell slot tracker — one chip per slot, by level
   - Multiclass casters may need multiple labeled pools with different recovery rules (e.g. Sorcerer long-rest slots vs. Warlock short-rest Pact Magic) — confirmed real case, not anticipated in the original spec. See "Reference character validation" below.
-- Max HP as a printed numbered track (1 to max) directly on the mat, with a sliding marker/clip tracking current HP — no separate bead bowl (superseded 2026-09-01, see Decisions log)
+- Max HP as a printed numbered track (1 to max) running along the **top edge** of the card, with a paperclip slid onto that edge tracking current HP — no separate bead bowl (superseded 2026-09-01, see Decisions log). Top edge specifically, not printed mid-card: a paperclip clips onto an edge, so the track has to physically be one.
 - Precomputed energy timer duration (DEX-adjusted)
 
 ## Explicitly excluded / not tracked
@@ -64,17 +64,15 @@ Not covered by the shared bin: **exhaustion** — dropped, no tracking mechanism
 
 ```
 ┌────────────────────────────────────────────────┐
+│ HP  1   5   10   15   20   25   30   35  40  44 │
+│     •---•----•----•----•----•----•----•----•-🖇│ ← clip slides along the top edge
+├────────────────────────────────────────────────┤
 │  ARVIN                                          │
 │  Autognome — Warlock 5 (Fathomless) /           │
 │                      Sorcerer 1 (Storm Sorcery) │
 ├────────────────────────────────────────────────┤
 │  AC 16               Energy Timer: 14s          │
 │                        (15s − 1s, DEX +3)       │
-├────────────────────────────────────────────────┤
-│  HP TRACK  (paperclip slider, 1–44)             │
-│   1    5   10   15   20   25   30   35   40  44 │
-│   •----•----•----•----•----•----•----•----•--🖇 │
-│                               clip at: 44 (full)│
 ├────────────────────────────────────────────────┤
 │  SAVING THROWS              (● = proficient)    │
 │   STR -1       DEX +3        CON +2             │
